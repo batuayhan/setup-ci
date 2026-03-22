@@ -1,9 +1,0 @@
-#!/bin/sh
-
-# Auto-translate if en.json changed in the merge
-if git diff HEAD@{1} --name-only | grep -q "src/i18n/en.json"; then
-  echo "🌍 en.json changed — running i18n agent..."
-  dev-agent i18n "$(pwd)" 2>/dev/null || {
-    echo "⚠️  i18n agent not available, run manually: dev-agent i18n"
-  }
-fi

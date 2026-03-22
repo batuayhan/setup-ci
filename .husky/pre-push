@@ -1,8 +1,0 @@
-#!/bin/sh
-
-echo "🔍 Running QA agent before push..."
-dev-agent qa "$(pwd)" 2>/dev/null || {
-  echo "⚠️  QA agent not available, running basic checks..."
-  npm run type-check 2>&1 | tail -3
-  npm run test -- --passWithNoTests 2>&1 | tail -5
-}

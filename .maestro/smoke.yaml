@@ -1,6 +1,0 @@
-appId: ${APP_ID}
-name: Smoke Test
----
-- launchApp
-- assertVisible: ".*"  # App renders without crash
-- takeScreenshot: smoke-test

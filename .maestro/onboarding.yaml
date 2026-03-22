@@ -1,6 +1,0 @@
-appId: ${APP_ID}
-name: Onboarding Flow
----
-- launchApp
-- assertVisible: ".*"  # App launched successfully
-- takeScreenshot: onboarding-start

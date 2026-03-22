@@ -1,0 +1,11 @@
+node_modules
+.eslintrc.js
+.prettierrc
+.prettierignore
+jest.config.js
+.github
+.gitleaks.toml
+.husky
+.maestro
+scripts
+package-lock.json
