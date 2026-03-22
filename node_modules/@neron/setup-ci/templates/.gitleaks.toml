@@ -1,0 +1,72 @@
+[extend]
+useDefault = true
+
+title = "Expo/RN project gitleaks config"
+
+# --- Custom rules for mobile-specific secrets ---
+
+[[rules]]
+id = "expo-token"
+description = "Expo access token"
+regex = '''expo_[a-zA-Z0-9]{20,}'''
+keywords = ["expo_"]
+
+[[rules]]
+id = "revenuecat-secret"
+description = "RevenueCat secret API key"
+regex = '''sk_[a-zA-Z0-9]{20,}'''
+keywords = ["sk_"]
+
+[[rules]]
+id = "firebase-service-account"
+description = "Firebase/GCP service account private key"
+regex = '''"private_key"\s*:\s*"-----BEGIN'''
+keywords = ["private_key"]
+
+[[rules]]
+id = "stripe-secret"
+description = "Stripe secret key"
+regex = '''sk_(live|test)_[a-zA-Z0-9]{20,}'''
+keywords = ["sk_live_", "sk_test_"]
+
+[[rules]]
+id = "generic-secret-assignment"
+description = "Generic secret assignment in code"
+regex = '''(?i)(password|secret|token|api_key|apikey|auth_token)\s*[=:]\s*['"][a-zA-Z0-9/+]{16,}['"]'''
+keywords = ["password", "secret", "token", "api_key", "apikey", "auth_token"]
+
+# --- Allowlist: public tokens that are safe in client code ---
+
+[allowlist]
+description = "Public tokens safe for client-side use"
+regexTarget = "match"
+regexes = [
+  # RevenueCat public keys
+  '''appl_[a-zA-Z0-9]+''',
+  '''goog_[a-zA-Z0-9]+''',
+  # Firebase client config (apiKey, messagingSenderId, appId, etc.)
+  '''"apiKey"\s*:\s*"AIza[a-zA-Z0-9_-]+"''',
+  '''"messagingSenderId"\s*:\s*"[0-9]+"''',
+  '''"appId"\s*:\s*"1:[0-9]+:''',
+  '''"storageBucket"\s*:\s*"[a-zA-Z0-9-]+\.''',
+  # Expo project ID
+  '''"projectId"\s*:\s*"[a-f0-9-]{36}"''',
+  # Sentry DSN (public by design)
+  '''https://[a-f0-9]+@[a-z0-9]+\.ingest\.sentry\.io/[0-9]+''',
+  # AdMob IDs
+  '''ca-app-pub-[0-9]+''',
+  # App Store / Play Store IDs
+  '''ascAppId.*[0-9]{8,}''',
+  # Bundle identifiers
+  '''(com|app|org)\.[a-z]+\.[a-z]+''',
+]
+
+paths = [
+  '''\.gitleaksignore''',
+  '''\.gitleaks\.toml''',
+  '''package-lock\.json''',
+  '''node_modules/''',
+  '''\.expo/''',
+  '''android/''',
+  '''ios/''',
+]
