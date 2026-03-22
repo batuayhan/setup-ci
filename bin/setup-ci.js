@@ -85,6 +85,8 @@ copyTemplate('.eslintrc.js');
 copyTemplate('.prettierrc');
 copyTemplate('.prettierignore');
 copyTemplate('.husky/pre-commit');
+copyTemplate('.husky/pre-push');
+copyTemplate('.husky/post-merge');
 copyTemplate('.gitleaks.toml');
 
 // Jest config — adjust moduleNameMapper based on tsconfig
