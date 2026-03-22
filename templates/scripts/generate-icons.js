@@ -50,7 +50,12 @@ const SIZES = {
 async function generateIcons(sourcePath) {
   if (!sourcePath) {
     // Try to find source icon
-    const candidates = ['icon-source.png', 'icon-1024.png', 'assets/icon-source.png', 'assets/icon.png'];
+    const candidates = [
+      'icon-source.png',
+      'icon-1024.png',
+      'assets/icon-source.png',
+      'assets/icon.png',
+    ];
     for (const c of candidates) {
       if (fs.existsSync(c)) {
         sourcePath = c;
@@ -103,7 +108,12 @@ async function generateIcons(sourcePath) {
     } else if (icon.name.includes('background')) {
       // Create solid white background for adaptive icon
       await sharp({
-        create: { width: icon.size, height: icon.size, channels: 4, background: { r: 255, g: 255, b: 255, alpha: 1 } },
+        create: {
+          width: icon.size,
+          height: icon.size,
+          channels: 4,
+          background: { r: 255, g: 255, b: 255, alpha: 1 },
+        },
       })
         .png()
         .toFile(outPath);

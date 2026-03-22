@@ -29,7 +29,9 @@ async function generateScreenshots() {
 
   if (!hasAppshot) {
     console.log(`\x1b[33m!\x1b[0m No .appshot/config.json found.`);
-    console.log(`  To set up screenshots, create .appshot/config.json with your screenshot configuration.`);
+    console.log(
+      `  To set up screenshots, create .appshot/config.json with your screenshot configuration.`
+    );
     console.log(`  See: https://github.com/batuayhan/appshot`);
     process.exit(0);
   }

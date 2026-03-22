@@ -67,7 +67,8 @@ async function generateMetadata() {
     const template = {
       appName: 'My App',
       shortDescription: 'One-line description of your app',
-      fullDescription: 'Detailed description of what your app does, its key features, and why users should download it.',
+      fullDescription:
+        'Detailed description of what your app does, its key features, and why users should download it.',
       features: ['Feature 1', 'Feature 2', 'Feature 3'],
       category: 'Utilities',
       targetAudience: 'General',
@@ -76,7 +77,9 @@ async function generateMetadata() {
       languages: ['en', 'tr'],
     };
     fs.writeFileSync(configPath, JSON.stringify(template, null, 2) + '\n');
-    console.log(`\x1b[33m!\x1b[0m Created template store.config.json — edit it with your app details, then run again.`);
+    console.log(
+      `\x1b[33m!\x1b[0m Created template store.config.json — edit it with your app details, then run again.`
+    );
     process.exit(0);
   }
 
@@ -135,11 +138,18 @@ Respond with ONLY valid JSON — an object where keys are language codes and val
   }
 
   // Also write a combined file
-  fs.writeFileSync(path.join(outDir, 'all-languages.json'), JSON.stringify(metadata, null, 2) + '\n');
+  fs.writeFileSync(
+    path.join(outDir, 'all-languages.json'),
+    JSON.stringify(metadata, null, 2) + '\n'
+  );
 
-  console.log(`\x1b[32m✓\x1b[0m Generated metadata for ${Object.keys(metadata).length} languages in store-metadata/`);
+  console.log(
+    `\x1b[32m✓\x1b[0m Generated metadata for ${Object.keys(metadata).length} languages in store-metadata/`
+  );
   Object.keys(metadata).forEach((lang) => {
-    console.log(`  ${lang}: ${metadata[lang].title} — ${metadata[lang].subtitle || metadata[lang].shortDescription}`);
+    console.log(
+      `  ${lang}: ${metadata[lang].title} — ${metadata[lang].subtitle || metadata[lang].shortDescription}`
+    );
   });
 }
 

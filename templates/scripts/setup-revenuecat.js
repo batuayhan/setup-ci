@@ -66,7 +66,9 @@ async function rcFetch(endpoint, method = 'GET', body = null) {
   const data = await res.json();
 
   if (!res.ok) {
-    throw new Error(`RevenueCat API ${method} ${endpoint}: ${res.status} — ${JSON.stringify(data)}`);
+    throw new Error(
+      `RevenueCat API ${method} ${endpoint}: ${res.status} — ${JSON.stringify(data)}`
+    );
   }
 
   return data;
@@ -100,7 +102,9 @@ async function setupRevenueCat() {
       ],
     };
     fs.writeFileSync(configPath, JSON.stringify(template, null, 2) + '\n');
-    console.log(`\x1b[33m!\x1b[0m Created template revenuecat.config.json — edit it, then run again.`);
+    console.log(
+      `\x1b[33m!\x1b[0m Created template revenuecat.config.json — edit it, then run again.`
+    );
     process.exit(0);
   }
 
