@@ -33,7 +33,7 @@ jobs:
         run: npm run format:check
 
       - name: Tests
-        run: npm run test:ci
+        run: npx jest --ci --coverage --passWithNoTests
 
       - name: Secret leak scan
         uses: gitleaks/gitleaks-action@v2
