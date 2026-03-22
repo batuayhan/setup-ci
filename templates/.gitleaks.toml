@@ -44,8 +44,10 @@ regexes = [
   # RevenueCat public keys
   '''appl_[a-zA-Z0-9]+''',
   '''goog_[a-zA-Z0-9]+''',
-  # Firebase client config (apiKey, messagingSenderId, appId, etc.)
+  # Firebase/GCP client keys (public, safe in client code)
   '''"apiKey"\s*:\s*"AIza[a-zA-Z0-9_-]+"''',
+  '''"current_key"\s*:\s*"AIza[a-zA-Z0-9_-]+"''',
+  '''AIza[a-zA-Z0-9_-]{30,}''',
   '''"messagingSenderId"\s*:\s*"[0-9]+"''',
   '''"appId"\s*:\s*"1:[0-9]+:''',
   '''"storageBucket"\s*:\s*"[a-zA-Z0-9-]+\.''',
@@ -69,4 +71,6 @@ paths = [
   '''\.expo/''',
   '''android/''',
   '''ios/''',
+  '''google-services\.json''',
+  '''GoogleService-Info\.plist''',
 ]
