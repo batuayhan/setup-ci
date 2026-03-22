@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality-check:
+    name: Quality Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Tests
+        run: npm run test:ci
+
+      - name: i18n check
+        run: npm run check:i18n || echo "::warning::Missing i18n translations found"
+
+      - name: Bundle size
+        run: |
+          npx expo export --platform web 2>/dev/null || true
+          if [ -d "dist" ]; then
+            SIZE=$(du -sk dist/ | cut -f1)
+            echo "### Bundle Size: ${SIZE}KB" >> $GITHUB_STEP_SUMMARY
+            rm -rf dist/
+          fi

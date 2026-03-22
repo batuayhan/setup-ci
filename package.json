@@ -1,0 +1,12 @@
+{
+  "name": "@neron/setup-ci",
+  "version": "1.0.0",
+  "description": "One-command CI/CD setup for Expo/React Native projects",
+  "bin": {
+    "setup-ci": "./bin/setup-ci.js"
+  },
+  "files": ["bin", "templates"],
+  "keywords": ["expo", "react-native", "ci", "cd", "eslint", "prettier", "jest", "github-actions"],
+  "author": "Batu Ayhan <batuhanayhan@neron.app>",
+  "license": "MIT"
+}
