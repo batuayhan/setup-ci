@@ -120,6 +120,23 @@ if (hasI18n) {
   warn('No src/i18n/en.json found — skipping i18n check');
 }
 
+// --- 4b. Icon generator ---
+
+log('Adding automation scripts...');
+fs.mkdirSync(path.join(CWD, 'scripts'), { recursive: true });
+copyTemplate('scripts/generate-icons.js');
+copyTemplate('scripts/generate-store-metadata.js');
+copyTemplate('scripts/generate-store-visuals.js');
+copyTemplate('scripts/generate-screenshots.js');
+copyTemplate('scripts/setup-revenuecat.js');
+success('Automation scripts added');
+
+// --- 4c. Maestro E2E tests ---
+log('Adding Maestro E2E test templates...');
+copyTemplate('.maestro/smoke.yaml');
+copyTemplate('.maestro/onboarding.yaml');
+success('Maestro E2E templates added');
+
 // --- 5. Update package.json scripts ---
 
 log('Adding scripts to package.json...');
@@ -145,6 +162,13 @@ if (hasAppJson) {
 if (hasI18n) {
   scripts['check:i18n'] = 'node scripts/check-i18n.js';
 }
+
+scripts['icons'] = 'node scripts/generate-icons.js';
+scripts['store:metadata'] = 'node scripts/generate-store-metadata.js';
+scripts['store:visuals'] = 'node scripts/generate-store-visuals.js';
+scripts['screenshots'] = 'node scripts/generate-screenshots.js';
+scripts['revenuecat'] = 'node scripts/setup-revenuecat.js';
+scripts['e2e'] = 'maestro test .maestro/';
 
 currentPkg.scripts = scripts;
 
@@ -182,11 +206,21 @@ console.log(`
 \x1b[1m  CI/CD setup complete for ${projectName}\x1b[0m
 \x1b[32m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m
 
-  \x1b[36mAvailable commands:\x1b[0m
+  \x1b[36mCode quality:\x1b[0m
     npm run lint          Lint code
     npm run format        Format code
     npm run test          Run tests
-    npm run type-check    TypeScript check${hasI18n ? '\n    npm run check:i18n    Check translations' : ''}${hasAppJson ? '\n    npm run ota           OTA update (JS-only)\n    npm run release       Full build + store submit' : ''}
+    npm run type-check    TypeScript check${hasI18n ? '\n    npm run check:i18n    Check translations' : ''}
+
+  \x1b[36mBuild & deploy:\x1b[0m${hasAppJson ? '\n    npm run ota           OTA update (JS-only)\n    npm run release       Full build + store submit' : ''}
+    npm run e2e           Run Maestro E2E tests
+
+  \x1b[36mAsset generation:\x1b[0m
+    npm run icons         Generate all icon variants
+    npm run store:metadata  Generate store descriptions (Claude API)
+    npm run store:visuals   Generate feature graphic + promo banner
+    npm run screenshots     Generate App Store screenshots
+    npm run revenuecat      Setup RevenueCat subscriptions
 
   \x1b[36mWhat happens automatically:\x1b[0m
     git commit    → Husky runs lint + format
@@ -198,9 +232,10 @@ console.log(`
     Local: install gitleaks for pre-commit scanning:
       brew install gitleaks
 
-  \x1b[33mManual steps remaining:\x1b[0m
+  \x1b[33mOne-time setup:\x1b[0m
     1. Add EXPO_TOKEN to GitHub repo secrets
     2. Configure store credentials: eas credentials
     3. Install gitleaks: brew install gitleaks
-    4. Commit: git add -A && git commit -m "chore: add CI/CD automation"
+    4. Install Maestro: curl -Ls https://get.maestro.mobile.dev | bash
+    5. Commit: git add -A && git commit -m "chore: add CI/CD automation"
 `);
