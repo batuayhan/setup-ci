@@ -85,6 +85,7 @@ copyTemplate('.eslintrc.js');
 copyTemplate('.prettierrc');
 copyTemplate('.prettierignore');
 copyTemplate('.husky/pre-commit');
+copyTemplate('.gitleaks.toml');
 
 // Jest config — adjust moduleNameMapper based on tsconfig
 const jestConfig = fs.readFileSync(path.join(TEMPLATES, 'jest.config.js'), 'utf8');
@@ -192,8 +193,14 @@ console.log(`
     git push      → CI runs type-check, lint, tests
     git tag vX.Y.Z → Build + store submit + GitHub Release
 
+  \x1b[36mSecret scanning:\x1b[0m
+    CI: gitleaks runs automatically on every push
+    Local: install gitleaks for pre-commit scanning:
+      brew install gitleaks
+
   \x1b[33mManual steps remaining:\x1b[0m
     1. Add EXPO_TOKEN to GitHub repo secrets
     2. Configure store credentials: eas credentials
-    3. Commit: git add -A && git commit -m "chore: add CI/CD automation"
+    3. Install gitleaks: brew install gitleaks
+    4. Commit: git add -A && git commit -m "chore: add CI/CD automation"
 `);
