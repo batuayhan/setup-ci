@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -35,11 +35,21 @@ jobs:
       - name: Tests
         run: npx jest --ci --coverage --passWithNoTests
 
+      # gitleaks-action@v2 leaves $RUNNER_TEMP/gitleaks.tmp behind on self-hosted runners and the next run then fails
+      # with "Destination file path ... already exists" (a pass/fail alternation that is not a leak). Clear it before
+      # the scan and again afterwards, even when the scan fails.
+      - name: Clear stale gitleaks temp file
+        run: rm -f "$RUNNER_TEMP/gitleaks.tmp"
+
       - name: Secret leak scan
         continue-on-error: true
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clean up gitleaks temp file
+        if: always()
+        run: rm -f "$RUNNER_TEMP/gitleaks.tmp"
 
       - name: i18n check
         run: npm run check:i18n || echo "::warning::Missing i18n translations found"
