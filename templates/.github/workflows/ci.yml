@@ -35,11 +35,13 @@ jobs:
       - name: Tests
         run: npx jest --ci --coverage --passWithNoTests
 
-      # gitleaks-action@v2 leaves $RUNNER_TEMP/gitleaks.tmp behind on self-hosted runners and the next run then fails
+      # gitleaks-action@v2 leaves gitleaks.tmp in the temp dir behind on self-hosted runners and the next run then fails
       # with "Destination file path ... already exists" (a pass/fail alternation that is not a leak). Clear it before
-      # the scan and again afterwards, even when the scan fails.
+      # the scan and again afterwards, even when the scan fails. It is $TMPDIR, not $RUNNER_TEMP: measured on the
+      # self-hosted runners, whose .env sets TMPDIR to <runner>/_tmp, that is where gitleaks writes (gitleaks-8.x dirs and
+      # stale gitleaks.tmp files sit in _tmp; <runner>/_work/_temp holds none of them).
       - name: Clear stale gitleaks temp file
-        run: rm -f "$RUNNER_TEMP/gitleaks.tmp"
+        run: rm -f "${TMPDIR:-/tmp}/gitleaks.tmp"
 
       - name: Secret leak scan
         continue-on-error: true
@@ -49,7 +51,7 @@ jobs:
 
       - name: Clean up gitleaks temp file
         if: always()
-        run: rm -f "$RUNNER_TEMP/gitleaks.tmp"
+        run: rm -f "${TMPDIR:-/tmp}/gitleaks.tmp"
 
       - name: i18n check
         run: npm run check:i18n || echo "::warning::Missing i18n translations found"
