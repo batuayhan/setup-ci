@@ -9,12 +9,12 @@ updates:
     labels:
       - 'dependencies'
     ignore:
+      # SDK-bound: these move only through a deliberate Expo SDK upgrade.
       - dependency-name: 'expo'
-        update-types: ['version-update:semver-major']
-      - dependency-name: 'react-native'
-        update-types: ['version-update:semver-major']
+      - dependency-name: 'expo-*'
       - dependency-name: 'react'
-        update-types: ['version-update:semver-major']
+      - dependency-name: 'react-dom'
+      - dependency-name: 'react-native'
 
   - package-ecosystem: 'github-actions'
     directory: '/'
