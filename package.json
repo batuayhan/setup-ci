@@ -7,7 +7,8 @@
     "setup-ci-sync": "./bin/sync.js"
   },
   "scripts": {
-    "postinstall": "node bin/sync.js"
+    "postinstall": "node bin/sync.js",
+    "test": "node --test"
   },
   "files": [
     "bin",
