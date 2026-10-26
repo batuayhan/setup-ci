@@ -1,10 +1,8 @@
 name: CI
 
+# Founder rule 2026-10-27: no CI runs on any repo; the quality gate and local tests are the checks. Manual only.
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
 
 jobs:
   quality-check:

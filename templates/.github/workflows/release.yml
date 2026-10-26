@@ -1,9 +1,8 @@
 name: Release
 
+# Founder rule 2026-10-27: nothing runs on push or pull_request, tags included. Manual only.
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
 
 jobs:
   quality-check:

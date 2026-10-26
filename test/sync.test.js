@@ -117,6 +117,23 @@ test('setupCi without a skip list changes nothing', () => {
   for (const f of MANAGED) assert.equal(read(dir, f), tpl(f), f);
 });
 
+// Founder rule 2026-10-27: no GitHub Actions workflow runs on push or pull_request in any repo that syncs this package.
+test('a synced repo has no workflow that runs on push or pull_request, and dependabot does not touch actions', () => {
+  const dir = project({ name: 'x' });
+  assert.equal(run(dir).code, 0);
+  const wfDir = path.join(dir, '.github', 'workflows');
+  const workflows = fs.readdirSync(wfDir).filter((f) => /\.ya?ml$/.test(f));
+  assert.ok(workflows.length > 0);
+  for (const f of workflows) {
+    const body = fs.readFileSync(path.join(wfDir, f), 'utf8');
+    const on = /^on:\s*\n((?:[ \t]+.*\n|[ \t]*#.*\n|\n)*)/m.exec(body);
+    assert.ok(on, `${f} has an on: block`);
+    const triggers = on[1].split('\n').filter((l) => /^ {2}\S/.test(l)).map((l) => l.trim().replace(/:.*$/, ''));
+    assert.deepEqual(triggers, ['workflow_dispatch'], f);
+  }
+  assert.doesNotMatch(read(dir, '.github/dependabot.yml'), /github-actions/);
+});
+
 test('init-only files are still never overwritten', () => {
   const dir = project({ name: 'x' }, { '.prettierrc': 'mine\n' });
   run(dir);
