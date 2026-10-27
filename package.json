@@ -1,6 +1,6 @@
 {
   "name": "@neron/setup-ci",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "One-command CI/CD setup for Expo/React Native projects. Install as devDependency — configs auto-sync on npm update.",
   "bin": {
     "setup-ci": "./bin/setup-ci.js",

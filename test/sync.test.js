@@ -10,7 +10,7 @@ const { spawnSync } = require('child_process');
 const SYNC = path.join(__dirname, '..', 'bin', 'sync.js');
 const TEMPLATES = path.join(__dirname, '..', 'templates');
 const MANAGED = [
-  '.gitleaks.toml', '.github/workflows/ci.yml', '.github/workflows/release.yml', '.github/dependabot.yml',
+  '.gitleaks.toml', '.github/workflows/ci.yml', '.github/workflows/release.yml',
   '.husky/pre-commit', '.husky/pre-push', '.husky/post-merge', '.maestro/smoke.yaml', '.maestro/onboarding.yaml',
   'scripts/generate-icons.js', 'scripts/generate-store-metadata.js', 'scripts/generate-store-visuals.js',
   'scripts/generate-screenshots.js', 'scripts/setup-revenuecat.js', 'scripts/check-i18n.js',
@@ -69,9 +69,39 @@ test('every skipped file prints exactly one note, so a skip is never silent', ()
 });
 
 test('a skipped file the repo does not have is not created', () => {
-  const dir = project({ name: 'x', setupCi: { skip: ['.github/dependabot.yml'] } });
+  const dir = project({ name: 'x', setupCi: { skip: ['.husky/pre-push'] } });
   run(dir);
+  assert.equal(exists(dir, '.husky/pre-push'), false);
+});
+
+// Founder rule 2026-10-27: no Dependabot version updates. 1.2.1 writes no dependabot.yml and retires its own old ones.
+const RETIRED_DIR = path.join(TEMPLATES, 'retired');
+test('a fresh sync writes no dependabot.yml', () => {
+  const dir = project({ name: 'x' });
+  assert.equal(run(dir).code, 0);
   assert.equal(exists(dir, '.github/dependabot.yml'), false);
+});
+
+test('a dependabot.yml that setup-ci once wrote, in any version, is deleted', () => {
+  for (const f of fs.readdirSync(RETIRED_DIR)) {
+    const dir = project({ name: 'x' }, { '.github/dependabot.yml': fs.readFileSync(path.join(RETIRED_DIR, f), 'utf8') });
+    assert.equal(run(dir).code, 0, f);
+    assert.equal(exists(dir, '.github/dependabot.yml'), false, f);
+  }
+});
+
+test('a dependabot.yml the repo edited is left alone, with a note', () => {
+  const dir = project({ name: 'x' }, { '.github/dependabot.yml': 'version: 2\nupdates: []\n' });
+  const r = run(dir);
+  assert.equal(read(dir, '.github/dependabot.yml'), 'version: 2\nupdates: []\n');
+  assert.match(r.out, /dependabot\.yml \(retired, but edited/);
+});
+
+test('setupCi.skip keeps a retired dependabot.yml', () => {
+  const old = fs.readFileSync(path.join(RETIRED_DIR, 'dependabot-1.2.0.yml'), 'utf8');
+  const dir = project({ name: 'x', setupCi: { skip: ['.github/dependabot.yml'] } }, { '.github/dependabot.yml': old });
+  run(dir);
+  assert.equal(read(dir, '.github/dependabot.yml'), old);
 });
 
 test('the notes are printed in postinstall mode too, where the per-file ticks are not', () => {
@@ -118,7 +148,7 @@ test('setupCi without a skip list changes nothing', () => {
 });
 
 // Founder rule 2026-10-27: no GitHub Actions workflow runs on push or pull_request in any repo that syncs this package.
-test('a synced repo has no workflow that runs on push or pull_request, and dependabot does not touch actions', () => {
+test('a synced repo has no workflow that runs on push or pull_request', () => {
   const dir = project({ name: 'x' });
   assert.equal(run(dir).code, 0);
   const wfDir = path.join(dir, '.github', 'workflows');
@@ -131,7 +161,6 @@ test('a synced repo has no workflow that runs on push or pull_request, and depen
     const triggers = on[1].split('\n').filter((l) => /^ {2}\S/.test(l)).map((l) => l.trim().replace(/:.*$/, ''));
     assert.deepEqual(triggers, ['workflow_dispatch'], f);
   }
-  assert.doesNotMatch(read(dir, '.github/dependabot.yml'), /github-actions/);
 });
 
 test('init-only files are still never overwritten', () => {

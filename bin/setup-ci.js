@@ -108,7 +108,6 @@ success('Config files created');
 log('Creating GitHub Actions workflows...');
 copyTemplate('.github/workflows/ci.yml');
 copyTemplate('.github/workflows/release.yml');
-copyTemplate('.github/dependabot.yml');
 success('Workflows created');
 
 // --- 4. i18n check (only if project has i18n) ---

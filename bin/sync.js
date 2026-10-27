@@ -23,7 +23,6 @@ const MANAGED_FILES = [
   '.gitleaks.toml',
   '.github/workflows/ci.yml',
   '.github/workflows/release.yml',
-  '.github/dependabot.yml',
   '.husky/pre-commit',
   '.husky/pre-push',
   '.husky/post-merge',
@@ -46,7 +45,11 @@ const MANAGED_FILES = [
 // mode); an entry that names no managed file is reported; and a setting that cannot be read -- a package.json that does
 // not parse, a skip that is not a list of paths -- fails CLOSED: no managed file is written at all, because guessing
 // "sync everything" is what overwrites a repo's own files.
-const MANAGED_SET = new Set(MANAGED_FILES);
+// Retired files: setup-ci no longer ships them (founder rule 2026-10-27: no Dependabot version updates, they run as
+// Actions jobs). The sync deletes one only when its content is byte-identical to a version setup-ci itself once
+// wrote (templates/retired/); a file the repo edited is its own and is left, with a note. setupCi.skip still works.
+const RETIRED = { '.github/dependabot.yml': ['dependabot-1.0.x.yml', 'dependabot-1.1.x.yml', 'dependabot-1.2.0.yml'] };
+const MANAGED_SET = new Set([...MANAGED_FILES, ...Object.keys(RETIRED)]);
 
 function loadSkip() {
   const pkgPath = path.join(CWD, 'package.json');
@@ -72,6 +75,24 @@ function loadSkip() {
     else problems.push(`  \x1b[33m!\x1b[0m setupCi.skip: ${entry} is not a managed file, ignored`);
   }
   return { skip, problems };
+}
+
+
+function retire(file) {
+  const target = path.join(CWD, file);
+  if (!fs.existsSync(target)) return;
+  if (optOut.skip.has(file)) {
+    console.log(`  \x1b[33m~\x1b[0m ${file} (retired, but skipped: setupCi.skip in package.json)`);
+    return;
+  }
+  const body = fs.readFileSync(target, 'utf8');
+  const shipped = RETIRED[file].some((n) => fs.readFileSync(path.join(TEMPLATES, 'retired', n), 'utf8') === body);
+  if (shipped) {
+    fs.unlinkSync(target);
+    console.log(`  \x1b[32m-\x1b[0m ${file} (retired: no longer managed, removed)`);
+  } else {
+    console.log(`  \x1b[33m~\x1b[0m ${file} (retired, but edited by this repo: left alone)`);
+  }
 }
 
 // Files that are only created if they DON'T exist (user may customize)
@@ -113,6 +134,8 @@ for (const file of MANAGED_FILES) {
     if (isVerbose) console.log(`  \x1b[32m✓\x1b[0m ${file}`);
   }
 }
+
+for (const file of Object.keys(RETIRED)) retire(file);
 
 // Init-only files (don't overwrite user customizations)
 for (const file of INIT_ONLY_FILES) {
